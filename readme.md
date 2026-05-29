@@ -1,18 +1,19 @@
-# 🚀 Tech Research Assistant (LangGraph + Groq + Tavily)
+# 🚀 Tech Research Assistant (Streamlit + LangGraph + Groq)
 
-An advanced **AI-powered multi-agent system** that generates detailed **technology-focused reports** from user queries using **LangGraph, Groq LLM (LLaMA 3.1), and Tavily search**.
+An advanced **AI-powered multi-agent system** that generates detailed **technology-focused reports** using **LangGraph, Groq LLM, and Tavily search**, with a modern **ChatGPT-style Streamlit interface**.
 
 ---
 
 ## 📌 Overview
 
-This project is an **interactive CLI-based AI assistant** that:
+This project is an **interactive AI assistant** that:
 
-* Accepts **technology-related queries**
-* Performs **real-time web research**
-* Generates **deep analysis using LLMs**
-* Produces **structured reports with verified sources**
-* Supports **multiple queries in a loop**
+* 💬 Accepts user queries via chat UI
+* 🧠 Uses LLM to **classify queries (TECH / NON-TECH)**
+* 🔍 Performs real-time **web research (Tavily)**
+* 📊 Generates **deep analysis (LLM)**
+* 📝 Produces **structured reports with sources**
+* 🚫 Rejects non-technology queries intelligently
 
 ---
 
@@ -21,13 +22,16 @@ This project is an **interactive CLI-based AI assistant** that:
 ```text
 User Query
    ↓
-🧠 Supervisor Agent (controls flow)
+🧠 LLM Classifier (TECH / NON-TECH)
    ↓
-🔍 Research Agent (Tavily Search)
+IF NON-TECH → Reject Response
+IF TECH →
    ↓
-📊 Analysis Agent (LLM reasoning)
+🔍 Research Agent
    ↓
-📝 Report Agent (structured output)
+📊 Analysis Agent
+   ↓
+📝 Report Agent
    ↓
 Final Report
 ```
@@ -36,10 +40,11 @@ Final Report
 
 ## ⚙️ Tech Stack
 
-* **LangGraph** – Multi-agent workflow orchestration
+* **Streamlit** – Web UI (chat interface)
+* **LangGraph** – Multi-agent orchestration
 * **LangChain** – LLM integration
-* **Groq (LLaMA 3.1)** – Fast inference engine
-* **Tavily API** – Real-time web search
+* **Groq (LLaMA 3.1)** – Fast inference
+* **Tavily API** – Web search
 * **Python** – Core backend
 
 ---
@@ -48,17 +53,17 @@ Final Report
 
 ```text
 .
-├── main.py                  # CLI loop entry point
-├── graph.py                 # LangGraph workflow builder
-├── llm.py                   # Groq LLM configuration
+├── app.py                  # Streamlit UI (main app)
+├── graph.py                # LangGraph workflow
+├── llm.py                  # Groq LLM config
+├── state.py              
 ├── agents/
 │   ├── research_agent.py
 │   ├── analysis_agent.py
 │   ├── report_agent.py
 │   └── supervisor.py
-├── tools/
-│   └── tavily_search.py
-├── .env                     # API keys
+├── tools.py  
+├── .env
 └── README.md
 ```
 
@@ -66,7 +71,7 @@ Final Report
 
 ## 🔑 Setup Instructions
 
-### 1. Clone the repository
+### 1. Clone repository
 
 ```bash
 git clone <your-repo-url>
@@ -79,142 +84,107 @@ cd <repo-name>
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment variables
+### 3. Add API keys
 
-Create a `.env` file:
+Create `.env` file:
 
 ```env
-GROQ_API_KEY=your_groq_api_key
-TAVILY_API_KEY=your_tavily_api_key
+GROQ_API_KEY=your_groq_key
+TAVILY_API_KEY=your_tavily_key
 ```
 
 ---
 
-## ▶️ Run the Application
+## ▶️ Run the App
 
 ```bash
-python main.py
+streamlit run app.py
 ```
 
 ---
 
-## 💻 Usage
+## 💻 Features
+
+### 💬 Chat Interface
+
+* ChatGPT-style UI
+* Persistent chat history
+
+### 🧠 Intelligent Query Handling
+
+* LLM classifies query:
+
+  * ✅ TECH → full pipeline
+  * ❌ NON-TECH → polite rejection
+
+### 📄 Structured Reports
+
+* Executive summary
+* Technical explanation
+* Tools & technologies
+* Use cases
+* Trends & future scope
+* Sources (no hallucinations)
+
+### 📊 Observability
+
+* Latency tracking
+* Step logs
+* Expandable debug info
+
+---
+
+## 🔍 Example Queries
+
+### ✅ Valid (Technology)
+
+* What is LangGraph?
+* React vs Angular
+* Explain vector databases
+* How does Kubernetes work?
+
+### ❌ Invalid (Rejected)
+
+* Who is Virat Kohli
+* Tell me a joke
+* Hi / Hello
+
+---
+
+## 🚫 Non-Tech Handling
+
+If user asks non-technology question:
 
 ```text
-💻 Tech Research Assistant
+⚠️ I can only answer technology-related questions.
 
-👉 Enter your question: What is LangGraph?
-
-✅ FINAL REPORT:
-[Generated structured report]
-
-------------------------------------------------------------
-
-👉 Enter your question: React vs Angular
-
-✅ FINAL REPORT:
-[Comparison report]
-
-------------------------------------------------------------
-
-👉 Enter your question: Future of AI agents
-
-✅ FINAL REPORT:
-[Trend analysis]
-
-------------------------------------------------------------
-
-👉 exit
-👋 Goodbye!
+Try asking:
+- What is LangGraph?
+- React vs Angular
+- How does Kubernetes work?
 ```
-
----
-
-## 🔍 Agents Explained
-
-### 🧠 Supervisor Agent
-
-* Controls workflow execution
-* Routes between agents based on state
-
----
-
-### 🔍 Research Agent
-
-* Uses Tavily API
-* Fetches real-time technology-related data
-
----
-
-### 📊 Analysis Agent
-
-* Processes research data
-* Extracts insights using LLM reasoning
-
----
-
-### 📝 Report Agent
-
-* Generates structured reports
-* Adapts format based on user query
-* Ensures **no hallucinated sources**
 
 ---
 
 ## 🔄 Workflow Logic
 
 ```python
-if not research_data:
-    → research_agent
-elif not analysis:
-    → analysis_agent
-elif not report:
-    → report_agent
+if query == NON-TECH:
+    return rejection_message
 else:
-    → end
+    run LangGraph pipeline
 ```
-
----
-
-## 📊 Features
-
-* ✅ Multi-agent architecture (LangGraph)
-* ✅ Technology-only domain specialization
-* ✅ Dynamic report generation (query-aware)
-* ✅ Source-backed outputs (no fake links)
-* ✅ Interactive CLI (multi-query loop)
-* ✅ Graph visualization (Mermaid PNG)
-* ✅ Logging + latency tracking
-
----
-
-## ⚠️ Limitations
-
-* Limited to **technology domain**
-* Dependent on external APIs (Groq, Tavily)
-* No persistent memory (stateless queries)
 
 ---
 
 ## 🚀 Future Improvements
 
-* [ ] Streamlit / Web UI
+* [ ] Streaming responses (typing effect)
+* [ ] Subdomain classification (AI / Web / Cloud)
 * [ ] FastAPI backend
-* [ ] Streaming responses
-* [ ] Subdomain classification (AI, Web, Cloud)
-* [ ] Memory (context-aware queries)
-* [ ] JSON structured outputs
-* [ ] LangSmith tracing & evaluation
-
----
-
-## 🧪 Example Queries
-
-* What is LangGraph?
-* React vs Angular
-* Explain vector databases
-* Future of AI agents
-* How does Kubernetes work?
+* [ ] User authentication
+* [ ] Deployment (Streamlit Cloud)
+* [ ] Memory (context-aware chat)
 
 ---
 
@@ -241,4 +211,4 @@ MIT License
 
 ---
 
-✨ *Built to explore real-world AI system design using multi-agent workflows.*
+✨ *Built as a real-world AI system with controlled LLM behavior and multi-agent workflows.*
